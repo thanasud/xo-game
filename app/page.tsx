@@ -20,10 +20,10 @@ export default function Page() {
   const isDraw = !winner && cells.every((c) => c !== null);
   const nextPlayer: Player = xIsNext ? "X" : "O";
   const status = winner
-    ? `ผู้ชนะ: ${winner}`
+    ? `Winner: ${winner}`
     : isDraw
-    ? "เสมอ"
-    : `ตาถัดไป: ${nextPlayer}${botEnabled && nextPlayer === "O" ? " (บอท)" : ""}`;
+    ? "Draw"
+    : `Next: ${nextPlayer}${botEnabled && nextPlayer === "O" ? " (bot)" : ""}`;
 
   async function tryFinish(next: Cell[]) {
     const w = calculateWinner(next, size);
@@ -52,7 +52,6 @@ export default function Page() {
       await appendMove(id, idx, me);
       await tryFinish(next);
 
-      // bot turn
       const stillNoWinner = !calculateWinner(next, size) && next.some((c) => c === null);
       if (botEnabled && stillNoWinner) {
         const botIndex = findBotMove(next, size, "O", "X");
@@ -69,7 +68,7 @@ export default function Page() {
       }
     } catch (err) {
       console.error(err);
-      alert("บันทึกตาเดินไม่สำเร็จ ลองเริ่มใหม่อีกครั้ง");
+      alert("Failed to save move. Please try starting a new game.");
     } finally {
       setBusy(false);
     }
@@ -85,24 +84,23 @@ export default function Page() {
 
   useEffect(() => {
     startNewGame(size, "X");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <main className="min-h-dvh grid place-items-center p-6">
       <div className="w-full max-w-5xl space-y-8">
         <header className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-neutral-900">XO Game</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">XO Game</h1>
         </header>
 
-        <section className="grid md:grid-cols-[1fr_360px] gap-8 items-start">
+        <section className="grid md:grid-cols-[1fr_480px] gap-8 items-stretch">
           <div className="space-y-4">
             <div className="rounded-lg border border-neutral-200 p-4 bg-white">
               <div className="mb-3 flex items-center justify-between">
-                <div className={`text-xs px-2 py-0.5 rounded-full ${winner ? "bg-emerald-100 text-emerald-700" : isDraw ? "bg-neutral-100 text-neutral-700" : "bg-sky-100 text-sky-700"}`}>
+                <div className={`text-xl px-2 py-0.5 rounded-full ${winner ? "bg-emerald-100 text-emerald-700" : isDraw ? "bg-neutral-100 text-neutral-700" : "bg-sky-100 text-sky-700"}`}>
                   {winner ? "Finished" : isDraw ? "Draw" : "Playing"}
                 </div>
-                <div className="text-sm text-neutral-600">{status}</div>
+                <div className="text-base text-neutral-600">{status}</div>
               </div>
               <Board
                 size={size}
@@ -113,9 +111,9 @@ export default function Page() {
               />
             </div>
 
-            <div className="rounded-lg border border-neutral-200 p-4 bg-white flex flex-wrap items-center gap-3">
-              <label className="text-sm flex items-center gap-2">
-                ขนาดกระดาน
+            <div className="rounded-lg border border-neutral-200 p-4 bg-white flex flex-wrap items-center gap-13">
+              <label className="text-base flex items-center gap-2">
+                Board size
                 <input
                   type="number"
                   min={3}
@@ -126,38 +124,40 @@ export default function Page() {
                     const n = Math.max(3, Math.min(10, parseInt(e.target.value || "3", 10)));
                     startNewGame(n, "X");
                   }}
-                  className=" w-20 rounded border border-neutral-200 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  className="text-center tabular-nums rounded border border-neutral-200  min-w-[6ch] focus:outline-none focus:ring-2 focus:ring-sky-400"
                   style={{ width: `${Math.max(6, String(size).length + 2)}ch` }}
                 />
               </label>
 
-              <label className="text-sm inline-flex items-center gap-2">
+              <label className="text-base inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={botEnabled}
                   onChange={(e) => setBotEnabled(e.target.checked)}
-                  className="accent-sky-600"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
-                เล่นกับบอท (O)
+                Play vs bot (O)
               </label>
 
               <button
                 onClick={() => startNewGame(size, "X")}
                 disabled={busy}
-                className="ml-auto inline-flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                className="ml-auto inline-flex items-center gap-2 rounded-md border border-neutral-200 px-3 py-2 text-base font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
               >
-                เริ่มใหม่
+                Reset
               </button>
             </div>
           </div>
 
-          <aside className="space-y-4">
-            <div className="rounded-lg border border-neutral-200 p-4 bg-white">
-              <GameList />
+          <aside className="space-y-2 md:row-span-2">
+            <div className="rounded-lg border border-neutral-200 p-4 bg-white  flex flex-col min-h-0">
+              <div className="min-h-0 flex-1">
+                <GameList />
+              </div>
             </div>
           </aside>
         </section>
-        <footer className="pt-2 text-center text-xs text-neutral-400">Next.js • TypeScript • Tailwind • MongoDB</footer>
+        <footer className="pt-2 text-center text-sm text-neutral-400">Next.js • TypeScript • Tailwind • MongoDB</footer>
       </div>
     </main>
   );

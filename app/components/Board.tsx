@@ -45,7 +45,7 @@ export default function Board({
               disabled={disabled || value !== null}
               onClick={() => onCellClick?.(idx)}
               className={[
-                "w-full aspect-square grid place-items-center rounded-lg border border-neutral-200 bg-white font-semibold text-xl sm:text-2xl transition-colors",
+                "w-full aspect-square grid place-items-center rounded-lg border-2 border-neutral-400 bg-white font-semibold text-2xl sm:text-3xl transition-colors",
                 color,
                 disabled
                   ? "cursor-not-allowed opacity-60"

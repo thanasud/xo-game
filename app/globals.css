@@ -1,26 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafb; /* softer */
+  --background: #D9CFC7;
   --foreground: #161617;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #696972;
-    --foreground: #000000;
-  }
-}
-
-/* Subtle background and cleaner defaults */
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

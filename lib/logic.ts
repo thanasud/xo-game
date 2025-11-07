@@ -53,20 +53,15 @@ export function findBotMove(cells: Cell[], size: number, bot: Player, human: Pla
   for (let i = 0; i < total; i++) if (cells[i] === null) empties.push(i);
   if (empties.length === 0) return null;
 
-  // helper to test a move
   const tryMove = (i: number, p: Player) => {
     const next = cells.slice();
     next[i] = p;
     return calculateWinner(next, size) === p;
   };
 
-  // 1) win
   for (const i of empties) if (tryMove(i, bot)) return i;
-  // 2) block
   for (const i of empties) if (tryMove(i, human)) return i;
-  // 3) center
   const center = Math.floor(total / 2);
   if (cells[center] === null) return center;
-  // 4) random
   return empties[Math.floor(Math.random() * empties.length)];
 }

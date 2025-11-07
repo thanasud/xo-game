@@ -30,13 +30,25 @@ export async function GET() {
   try {
     const games = await getCollection<Game>("games");
     const items = await games
-      // show only games that actually started (has at least 1 move)
-      .find({ "moves.0": { $exists: true } }, { projection: { moves: { $slice: 0 } } })
-      .sort({ createdAt: -1 })
-      .limit(50)
+      .aggregate([
+        { $match: { "moves.0": { $exists: true } } },
+        { $sort: { createdAt: -1 } },
+        { $limit: 50 },
+        {
+          $project: {
+            size: 1,
+            firstPlayer: 1,
+            createdAt: 1,
+            finishedAt: 1,
+            result: 1,
+            winner: 1,
+            moveCount: { $size: "$moves" },
+          },
+        },
+      ])
       .toArray();
 
-    const mapped = items.map((g) => ({
+    const mapped = items.map((g: any) => ({
       id: (g._id as ObjectId).toString(),
       size: g.size,
       firstPlayer: g.firstPlayer,
@@ -44,7 +56,7 @@ export async function GET() {
       finishedAt: g.finishedAt,
       result: g.result,
       winner: g.winner,
-      moveCount: g.moves?.length || 0,
+      moveCount: g.moveCount as number,
     }));
     return NextResponse.json({ games: mapped });
   } catch (err: any) {
